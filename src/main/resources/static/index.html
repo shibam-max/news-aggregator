@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Aggregator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center mb-4">📰 News Aggregator</h1>
+                <p class="text-center text-muted">Search news from Guardian and NY Times</p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form id="searchForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Search Keyword *</label>
+                                        <input type="text" class="form-control" id="keyword" placeholder="Enter search keyword (e.g., apple)" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Page Size</label>
+                                        <select class="form-select" id="pageSize">
+                                            <option value="5">5</option>
+                                            <option value="10" selected>10</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">City (Optional)</label>
+                                        <input type="text" class="form-control" id="city" placeholder="City filter">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="offlineMode">
+                                        <label class="form-check-label" for="offlineMode">Offline Mode</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <button type="submit" class="btn btn-primary" id="searchBtn">Search News</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger d-none"></div>
+        <div id="loadingSpinner" class="text-center d-none">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentRequest = {};
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            searchNews(1);
+        });
+
+        async function searchNews(page = 1) {
+            const keyword = document.getElementById('keyword').value;
+            const pageSize = document.getElementById('pageSize').value;
+            const city = document.getElementById('city').value;
+            const offlineMode = document.getElementById('offlineMode').checked;
+
+            if (!keyword.trim()) return;
+
+            currentRequest = { keyword, pageSize, city, offlineMode };
+            currentPage = page;
+
+            showLoading(true);
+            hideError();
+
+            try {
+                const params = new URLSearchParams({
+                    keyword,
+                    page,
+                    pageSize,
+                    offlineMode
+                });
+                if (city) params.append('city', city);
+
+                const response = await axios.get(`/api/v1/news/search?${params}`);
+                displayResults(response.data);
+            } catch (error) {
+                showError('Failed to fetch news. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Search Results</h4>
+                    <small class="text-muted">
+                        Execution time: ${data.executionTimeMs}ms
+                        ${data.fromCache ? ' (cached)' : ''}
+                        ${data.offlineMode ? ' (offline)' : ''}
+                    </small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Keyword:</strong> ${data.searchKeyword} | 
+                    <strong>Total Results:</strong> ${data.totalResults} | 
+                    <strong>Page:</strong> ${data.currentPage} of ${data.totalPages}
+                    ${data.city ? ` | <strong>City:</strong> ${data.city}` : ''}
+                </div>
+                
+                <div class="row">
+            `;
+
+            data.articles.forEach(article => {
+                html += `
+                    <div class="col-md-6 lg-4 mb-4">
+                        <div class="card h-100">
+                            ${article.imageUrl ? `<img src="${article.imageUrl}" class="card-img-top" style="height: 200px; object-fit: cover;">` : ''}
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title">${article.title}</h6>
+                                <p class="card-text flex-grow-1 small text-muted">${article.description || ''}</p>
+                                <div class="mt-auto">
+                                    <small class="text-muted d-block">
+                                        <strong>${article.source}</strong>
+                                        ${article.author ? ` • ${article.author}` : ''}
+                                        ${article.section ? ` • ${article.section}` : ''}
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        ${new Date(article.publishedAt).toLocaleDateString()}
+                                    </small>
+                                    <a href="${article.url}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+                                        Read Full Article
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            if (data.totalPages > 1) {
+                html += '<div class="d-flex justify-content-center"><nav><ul class="pagination">';
+                
+                if (data.previousPage) {
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="searchNews(${data.previousPage})">Previous</a></li>`;
+                }
+                
+                for (let i = Math.max(1, data.currentPage - 2); i <= Math.min(data.totalPages, data.currentPage + 2); i++) {
+                    html += `<li class="page-item ${i === data.currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="searchNews(${i})">${i}</a>
+                    </li>`;
+                }
+                
+                if (data.nextPage) {
+                    html += `<li class="page-item"><a class="page-link" href="#" onclick="searchNews(${data.nextPage})">Next</a></li>`;
+                }
+                
+                html += '</ul></nav></div>';
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').classList.toggle('d-none', !show);
+            document.getElementById('searchBtn').disabled = show;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorAlert');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('d-none');
+        }
+
+        function hideError() {
+            document.getElementById('errorAlert').classList.add('d-none');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+server:
+  port: 0
+
+spring:
+  cache:
+    type: simple
+
+guardian:
+  api:
+    key: test-guardian-key
+    url: https://content.guardianapis.com
+
+nytimes:
+  api:
+    key: test-nytimes-key
+
+logging:
+  level:
+    com.newsaggregator: DEBUG
+    org.springframework.web: INFO
