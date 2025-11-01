@@ -1,19 +1,19 @@
-# 📰 News Aggregator Microservice
+# News Aggregator Microservice
 
-Enterprise-grade news aggregation microservice that searches and aggregates news from **Guardian** and **New York Times** APIs with advanced features like pagination, offline mode, and duplicate elimination.
+A microservice that aggregates news articles from Guardian and New York Times APIs. Built with Spring Boot and includes pagination, offline fallback, and duplicate article removal.
 
-## 🚀 Features
+## Features
 
-- **Multi-Source Aggregation**: Combines news from Guardian UK and NY Times US APIs
-- **Smart Deduplication**: Eliminates duplicate articles using title and URL matching
-- **Pagination Support**: Configurable page size with navigation controls
-- **Offline Mode**: Fallback functionality when APIs are unavailable
-- **Caching**: Redis-based caching for improved performance
-- **Real-time Search**: Reactive programming with WebFlux
-- **Security**: Spring Security with encrypted API key management
-- **Production Ready**: Comprehensive monitoring, logging, and health checks
+- Searches and combines articles from Guardian UK and NY Times US APIs
+- Removes duplicate articles based on title and URL matching
+- Configurable pagination with default page sizes
+- Offline mode when external APIs are unavailable
+- Simple caching implementation for improved response times
+- Built with Spring WebFlux for reactive programming
+- Basic security configuration and input validation
+- Health monitoring and application metrics
 
-## 🏗️ Architecture
+## Architecture
 
 ### System Design
 ```
@@ -40,14 +40,13 @@ For detailed sequence diagrams and architecture documentation, see [ARCHITECTURE
 5. **Factory Pattern**: WebClient configuration
 6. **Template Method**: Exception handling structure
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 **Backend:**
-- Java 17
-- Spring Boot 3.2.0
-- Spring WebFlux (Reactive)
+- Java 8+
+- Spring Boot 2.7.18
+- Spring WebFlux
 - Spring Security
-- Spring Cache
 - Maven
 
 **Frontend:**
@@ -55,22 +54,17 @@ For detailed sequence diagrams and architecture documentation, see [ARCHITECTURE
 - Bootstrap 5
 - Axios
 
-**DevOps:**
-- Docker & Docker Compose
-- Jenkins CI/CD
-- JaCoCo (Code Coverage)
-- Swagger/OpenAPI 3
+**Testing & DevOps:**
+- JUnit 5 and Mockito for testing
+- Cucumber for BDD testing
+- Docker and Docker Compose
+- Jenkins pipeline
+- Swagger/OpenAPI documentation
 
-**Testing:**
-- JUnit 5
-- Mockito
-- Cucumber (BDD)
-- WebTestClient
-
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Java 17+
+- Java 8+
 - Maven 3.6+
 - Node.js 16+ (for frontend)
 - Docker (optional)
@@ -105,7 +99,7 @@ npm start
 docker-compose up --build
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
 - Local: `http://localhost:8080`
@@ -169,7 +163,7 @@ Content-Type: application/json
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Unit Tests
 ```bash
@@ -192,7 +186,7 @@ Content-Type: application/json
 ./mvnw test -Dtest=CucumberTestRunner
 ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Build Image
 ```bash
@@ -207,7 +201,7 @@ docker run -p 8080:8080 \
   news-aggregator:latest
 ```
 
-## 🔄 CI/CD Pipeline
+## CI/CD Pipeline
 
 The Jenkins pipeline includes:
 
@@ -233,7 +227,7 @@ pipeline {
 }
 ```
 
-## 📊 Monitoring & Health Checks
+## Monitoring & Health Checks
 
 ### Health Endpoint
 ```http
@@ -250,7 +244,7 @@ GET /actuator/metrics
 GET /actuator/info
 ```
 
-## 🔒 Security Features
+## Security Features
 
 - **API Key Encryption**: Sensitive configuration encrypted
 - **Input Validation**: Request parameter validation
@@ -258,7 +252,7 @@ GET /actuator/info
 - **Security Headers**: Standard security headers applied
 - **Rate Limiting**: API call throttling (configurable)
 
-## 🎯 Performance Optimizations
+## Performance Optimizations
 
 - **Reactive Programming**: Non-blocking I/O with WebFlux
 - **Caching**: Response caching for repeated queries
@@ -266,7 +260,7 @@ GET /actuator/info
 - **Async Processing**: Parallel API calls to multiple sources
 - **Memory Management**: Efficient object creation and GC tuning
 
-## 🔧 Configuration
+## Configuration
 
 ### Application Properties
 ```yaml
@@ -289,7 +283,7 @@ nytimes:
     key: ${NYTIMES_API_KEY}
 ```
 
-## 🚨 Error Handling
+## Error Handling
 
 The application handles various error scenarios:
 
@@ -299,7 +293,7 @@ The application handles various error scenarios:
 - **Network Timeouts**: Retry mechanisms
 - **Malformed Responses**: Error parsing handling
 
-## 📈 Scalability Considerations
+## Scalability Considerations
 
 - **Horizontal Scaling**: Stateless design for multiple instances
 - **Load Balancing**: Ready for load balancer integration
@@ -307,25 +301,24 @@ The application handles various error scenarios:
 - **Caching**: Redis cluster support for distributed caching
 - **Message Queues**: Kafka integration for event-driven architecture
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Support
+## Support
 
 For support and questions:
-- Email: support@newsaggregator.com
-- Documentation: [API Docs](http://localhost:8080/swagger-ui.html)
-- Issues: [GitHub Issues](https://github.com/your-org/news-aggregator/issues)
+- Documentation: [API Documentation](http://localhost:8080/swagger-ui.html)
+- Issues: Use the GitHub issues tracker
 
 ---
 
-**Built with ❤️ for enterprise news aggregation**
+News Aggregator Microservice v1.0.0

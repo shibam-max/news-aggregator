@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM openjdk:8-jdk-alpine
 
 LABEL maintainer="news-aggregator-team"
 LABEL version="1.0.0"
@@ -18,6 +18,9 @@ COPY src ./src
 
 # Build application
 RUN ./mvnw clean package -DskipTests
+
+# Install curl for health check
+RUN apk add --no-cache curl
 
 # Create non-root user
 RUN addgroup --system spring && adduser --system spring --ingroup spring

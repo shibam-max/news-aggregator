@@ -1,4 +1,4 @@
-# 📡 News Aggregator API Specification
+# News Aggregator API Specification
 
 ## OpenAPI 3.0 Specification
 
@@ -7,7 +7,7 @@
 - **Version**: 1.0.0
 - **Description**: Enterprise News Aggregator microservice that aggregates news from Guardian and NY Times APIs
 - **Base URL**: `http://localhost:8080`
-- **Contact**: support@newsaggregator.com
+- **Contact**: See GitHub repository for issues
 
 ### Authentication
 No authentication required for public endpoints.

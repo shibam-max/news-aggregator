@@ -1,4 +1,4 @@
-# 🏗️ News Aggregator Architecture
+# News Aggregator Architecture
 
 ## System Architecture Diagram
 
@@ -292,7 +292,7 @@ management:
 
 ### Docker Container
 ```dockerfile
-FROM openjdk:17-jdk-slim
+FROM openjdk:8-jdk-alpine
 WORKDIR /app
 COPY target/news-aggregator-1.0.0.jar app.jar
 EXPOSE 8080
@@ -310,8 +310,8 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ## Technology Stack Rationale
 
 ### Backend Choices
-- **Java 17**: Latest LTS with performance improvements
-- **Spring Boot 3.2**: Latest stable with native compilation support
+- **Java 8+**: Compatible with legacy systems and wide deployment support  
+- **Spring Boot 2.7**: Stable LTS version with production-proven reliability
 - **WebFlux**: Reactive programming for better resource utilization
 - **Maven**: Mature build tool with extensive plugin ecosystem
 

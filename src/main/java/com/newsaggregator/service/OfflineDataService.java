@@ -31,7 +31,7 @@ public class OfflineDataService {
     private List<NewsArticle> initializeOfflineData() {
         List<NewsArticle> articles = new ArrayList<>();
         
-        // Sample offline data for demonstration
+        // Initialize offline data cache
         articles.add(NewsArticle.builder()
                 .id("offline_1")
                 .title("Apple Announces New iPhone Features")
@@ -63,6 +63,28 @@ public class OfflineDataService {
                 .publishedAt(LocalDateTime.now().minusDays(3))
                 .author("Science Correspondent")
                 .section("Environment")
+                .build());
+                
+        articles.add(NewsArticle.builder()
+                .id("offline_4")
+                .title("Global Business Markets Show Strong Growth")
+                .description("International business markets demonstrate resilience with strong quarterly growth across sectors")
+                .url("https://example.com/business-growth")
+                .source("Business News Offline")
+                .publishedAt(LocalDateTime.now().minusDays(1))
+                .author("Business Reporter")
+                .section("Business")
+                .build());
+                
+        articles.add(NewsArticle.builder()
+                .id("offline_5")
+                .title("London Financial District Expansion")
+                .description("London's financial business district announces major expansion plans for next year")
+                .url("https://example.com/london-business")
+                .source("Finance News Offline")
+                .publishedAt(LocalDateTime.now().minusDays(2))
+                .author("Finance Correspondent")
+                .section("Finance")
                 .build());
                 
         return articles;
