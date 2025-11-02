@@ -25,7 +25,7 @@ This guide shows you exactly how to get your News Aggregator running with real G
 1. In IntelliJ, go to **Run → Edit Configurations**
 2. Select your `NewsAggregatorApplication` configuration (or create new if none exists)
 3. Look for **Environment Variables** section:
-   - **IntelliJ 2022+**: Click the folder icon 📁 next to "Environment variables" 
+   - **IntelliJ 2022+**: Click the folder icon next to "Environment variables" 
    - **IntelliJ 2020-2021**: Click "..." button next to "Environment variables" field
    - **Older versions**: Look for "Environment variables" text field
 4. In the popup window, click **+** (plus) button and add:
