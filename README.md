@@ -1,6 +1,6 @@
 # News Aggregator Microservice
 
-A microservice that aggregates news articles from Guardian and New York Times APIs. Built with Spring Boot and includes pagination, offline fallback, and duplicate article removal.
+Built by Shibam Samaddar - A microservice that aggregates news articles from Guardian and New York Times APIs. This project helped me learn Spring Boot reactive programming and API integration patterns.
 
 ## Features
 
@@ -69,14 +69,29 @@ For detailed sequence diagrams and architecture documentation, see [ARCHITECTURE
 - Node.js 16+ (for frontend)
 - Docker (optional)
 
-### API Keys Setup
-1. **Guardian API**: Register at https://open-platform.theguardian.com/
-2. **NY Times API**: Register at https://developer.nytimes.com/
+### Quick Setup with Real API Keys
 
-### Environment Variables
+**For immediate testing with real news data, see:** [**API_KEYS_SETUP.md**](API_KEYS_SETUP.md)
+
+The setup guide provides:
+- Step-by-step API key registration (Guardian + NY Times)
+- Multiple configuration methods (IntelliJ, Command Line, Docker)
+- Testing instructions with real news data
+
+### Instant Setup (Windows)
 ```bash
-export GUARDIAN_API_KEY=your_guardian_api_key
-export NYTIMES_API_KEY=your_nytimes_api_key
+# Run the automated setup script
+setup-and-run.bat
+```
+
+### Manual Setup
+```bash
+# Set your API keys
+set GUARDIAN_API_KEY=your-guardian-key
+set NYTIMES_API_KEY=your-nytimes-key
+
+# Run the application  
+mvnw spring-boot:run
 ```
 
 ### Running Locally
@@ -109,7 +124,11 @@ docker-compose up --build
 
 #### Search News
 ```http
+# With real API keys (online mode)
 GET /api/v1/news/search?keyword=apple&page=1&pageSize=10&city=london&offlineMode=false
+
+# Without API keys (offline mode) 
+GET /api/v1/news/search?keyword=apple&page=1&pageSize=10&offlineMode=true
 ```
 
 **Parameters:**
@@ -318,6 +337,30 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 For support and questions:
 - Documentation: [API Documentation](http://localhost:8080/swagger-ui.html)
 - Issues: Use the GitHub issues tracker
+
+## Quick Testing Guide
+
+### Option 1: Test Immediately (Offline Mode)
+```bash
+# No API keys needed - uses sample data
+mvnw spring-boot:run
+
+# Test with sample articles
+http://localhost:8080/api/v1/news/search?keyword=business&offlineMode=true
+```
+
+### Option 2: Test with Real News (Online Mode)  
+```bash
+# Follow API_KEYS_SETUP.md to get Guardian + NY Times keys
+# Then test with real news data
+http://localhost:8080/api/v1/news/search?keyword=technology&offlineMode=false
+```
+
+### Option 3: Use Automated Setup
+```bash
+# Windows users - runs setup wizard
+setup-and-run.bat
+```
 
 ---
 

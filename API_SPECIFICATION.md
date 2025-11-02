@@ -304,4 +304,4 @@ When `offlineMode=true` or external APIs are unavailable:
 - **WARN**: API failures, fallback activation
 - **ERROR**: Unexpected errors, system issues
 
-This API specification ensures comprehensive documentation for all consumers and provides clear guidance on expected behavior, error handling, and performance characteristics.
+This API specification documents the endpoints and provides guidance on expected behavior and error handling.
