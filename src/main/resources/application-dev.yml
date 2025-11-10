@@ -1,0 +1,55 @@
+# Development Environment Configuration
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  datasource:
+    url: jdbc:h2:mem:newsdb-dev;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# API Configuration - Development
+guardian:
+  api:
+    key: ${GUARDIAN_API_KEY:dev-guardian-key}
+    url: https://content.guardianapis.com
+
+nytimes:
+  api:
+    key: ${NYTIMES_API_KEY:dev-nytimes-key}
+
+# Logging - Development (Debug Mode)
+logging:
+  level:
+    com.newsaggregator: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    reactor.netty: DEBUG
+    io.github.resilience4j: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints - Development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

@@ -5,75 +5,66 @@ import com.newsaggregator.client.NYTimesApiClient;
 import com.newsaggregator.model.NewsArticle;
 import com.newsaggregator.model.NewsSearchRequest;
 import com.newsaggregator.model.NewsSearchResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NewsAggregatorService {
+public class EnhancedNewsAggregatorService {
     
     private final GuardianApiClient guardianClient;
     private final NYTimesApiClient nyTimesClient;
     private final OfflineDataService offlineDataService;
     private final CacheService cacheService;
     
+    @CircuitBreaker(name = "news-aggregator", fallbackMethod = "fallbackSearchNews")
+    @Retry(name = "news-aggregator")
+    @TimeLimiter(name = "news-aggregator")
+    public CompletableFuture<NewsSearchResponse> searchNewsWithResilience(NewsSearchRequest request) {
+        return searchNews(request).toFuture();
+    }
+    
     public Mono<NewsSearchResponse> searchNews(NewsSearchRequest request) {
-        // DEBUG POINT 4: Service method entry
-        log.debug("🔍 [DEBUG-4] Service.searchNews() - Entry: {}", request);
-        
         String cacheKey = cacheService.generateKey(request.getKeyword(), request.getPage(), request.getPageSize());
-        log.debug("🔍 [DEBUG-5] Cache key generated: {}", cacheKey);
         
-        // Check custom cache first
+        // Check cache first
         NewsSearchResponse cachedResponse = cacheService.get(cacheKey);
         if (cachedResponse != null) {
-            log.debug("🔍 [DEBUG-6] Cache HIT - Returning cached response");
             cachedResponse.setFromCache(true);
             return Mono.just(cachedResponse);
         }
-        log.debug("🔍 [DEBUG-7] Cache MISS - Proceeding with API calls");
         
         long startTime = System.currentTimeMillis();
         
         if (request.isOfflineMode()) {
-            log.debug("🔍 [DEBUG-8] Offline mode enabled - Using offline data");
             return handleOfflineSearch(request, startTime);
         }
         
-        log.debug("🔍 [DEBUG-9] Online mode - Making API calls to Guardian and NYTimes");
-        
         return Mono.zip(
                 guardianClient.searchNews(request.getKeyword(), request.getPage(), request.getPageSize())
-                    .doOnNext(articles -> log.debug("🔍 [DEBUG-10] Guardian API response: {} articles", articles.size()))
-                    .doOnError(error -> log.debug("🔍 [DEBUG-11] Guardian API error: {}", error.getMessage())),
+                    .timeout(Duration.ofSeconds(5)),
                 nyTimesClient.searchNews(request.getKeyword(), request.getPage(), request.getPageSize())
-                    .doOnNext(articles -> log.debug("🔍 [DEBUG-12] NYTimes API response: {} articles", articles.size()))
-                    .doOnError(error -> log.debug("🔍 [DEBUG-13] NYTimes API error: {}", error.getMessage()))
+                    .timeout(Duration.ofSeconds(5))
         )
         .map(tuple -> {
             List<NewsArticle> guardianArticles = tuple.getT1();
             List<NewsArticle> nyTimesArticles = tuple.getT2();
             
-            log.debug("🔍 [DEBUG-14] Starting aggregation: Guardian={}, NYTimes={}", 
-                      guardianArticles.size(), nyTimesArticles.size());
-            
             List<NewsArticle> aggregatedArticles = aggregateAndDeduplicateArticles(guardianArticles, nyTimesArticles);
-            
-            log.debug("🔍 [DEBUG-15] After aggregation and deduplication: {} articles", 
-                      aggregatedArticles.size());
             
             NewsSearchResponse response = buildResponse(request, aggregatedArticles, startTime, false, false);
             
-            log.debug("🔍 [DEBUG-16] Response built - Caching with key: {}", cacheKey);
-            // Cache the response using custom cache
+            // Cache the response
             cacheService.put(cacheKey, response);
             
             return response;
@@ -82,6 +73,12 @@ public class NewsAggregatorService {
             log.warn("API call failed, falling back to offline mode", error);
             return handleOfflineSearch(request, startTime);
         });
+    }
+    
+    // Fallback method for Circuit Breaker
+    public CompletableFuture<NewsSearchResponse> fallbackSearchNews(NewsSearchRequest request, Exception ex) {
+        log.warn("Circuit breaker activated, using fallback method", ex);
+        return handleOfflineSearch(request, System.currentTimeMillis()).toFuture();
     }
     
     private Mono<NewsSearchResponse> handleOfflineSearch(NewsSearchRequest request, long startTime) {
@@ -95,15 +92,7 @@ public class NewsAggregatorService {
     }
     
     private List<NewsArticle> aggregateAndDeduplicateArticles(List<NewsArticle> guardianArticles, List<NewsArticle> nyTimesArticles) {
-        // Use custom aggregation logic without 3rd party libraries
         return com.newsaggregator.util.NewsAggregator.aggregateAndSort(guardianArticles, nyTimesArticles);
-    }
-    
-    private List<NewsArticle> paginateArticles(List<NewsArticle> articles, int page, int pageSize) {
-        // Use custom pagination logic without 3rd party libraries
-        com.newsaggregator.util.NewsPaginator.PaginatedResult result = 
-            com.newsaggregator.util.NewsPaginator.paginate(articles, page, pageSize);
-        return result.getArticles();
     }
     
     private NewsSearchResponse buildResponse(NewsSearchRequest request, List<NewsArticle> articles, 

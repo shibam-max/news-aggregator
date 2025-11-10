@@ -1,6 +1,7 @@
 package com.newsaggregator.service;
 
 import com.newsaggregator.model.NewsArticle;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OfflineDataService {
     
     private final List<NewsArticle> offlineArticles;
@@ -18,9 +20,15 @@ public class OfflineDataService {
     }
     
     public List<NewsArticle> getOfflineArticles(String keyword) {
-        return offlineArticles.stream()
+        log.debug("🔍 [DEBUG-17] OfflineDataService.getOfflineArticles() - keyword: {}", keyword);
+        log.debug("🔍 [DEBUG-18] Total offline articles available: {}", offlineArticles.size());
+        
+        List<NewsArticle> filteredArticles = offlineArticles.stream()
                 .filter(article -> containsKeyword(article, keyword.toLowerCase()))
                 .collect(Collectors.toList());
+        
+        log.debug("🔍 [DEBUG-19] Filtered articles for keyword '{}': {}", keyword, filteredArticles.size());
+        return filteredArticles;
     }
     
     private boolean containsKeyword(NewsArticle article, String keyword) {
