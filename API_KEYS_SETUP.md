@@ -25,7 +25,7 @@ This guide shows you exactly how to get your News Aggregator running with real G
 1. In IntelliJ, go to **Run → Edit Configurations**
 2. Select your `NewsAggregatorApplication` configuration (or create new if none exists)
 3. Look for **Environment Variables** section:
-   - **IntelliJ 2022+**: Click the folder icon 📁 next to "Environment variables" 
+   - **IntelliJ 2022+**: Click the folder icon next to "Environment variables" 
    - **IntelliJ 2020-2021**: Click "..." button next to "Environment variables" field
    - **Older versions**: Look for "Environment variables" text field
 4. In the popup window, click **+** (plus) button and add:
@@ -111,15 +111,15 @@ docker-compose up
 ## Step 4: Verify It's Working
 
 ### Success Indicators:
-- ✅ Articles have real news titles
-- ✅ URLs point to guardian.com and nytimes.com  
-- ✅ Recent publication dates
-- ✅ Response shows `"fromCache": false, "offlineMode": false`
+- Articles have real news titles
+- URLs point to guardian.com and nytimes.com  
+- Recent publication dates
+- Response shows `"fromCache": false, "offlineMode": false`
 
 ### If It's Not Working:
-- ❌ Empty articles array → Check your API keys
-- ❌ 401/403 errors → Verify key permissions  
-- ❌ Still getting offline data → Ensure `offlineMode=false`
+- Empty articles array → Check your API keys
+- 401/403 errors → Verify key permissions  
+- Still getting offline data → Ensure `offlineMode=false`
 
 ## API Rate Limits
 
@@ -156,5 +156,3 @@ If APIs are temporarily down, test offline mode:
 ```
 http://localhost:8080/api/v1/news/search?keyword=business&offlineMode=true
 ```
-
-Your News Aggregator will automatically fall back to offline mode if APIs fail, ensuring 100% uptime!
